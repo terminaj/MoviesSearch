@@ -1,0 +1,95 @@
+
+
+ext.deps = [:]
+
+def versions = [:]
+versions.support_lib = "27.1.1"
+versions.dagger = "2.15"
+versions.junit = "4.12"
+versions.espresso = "3.0.1"
+versions.arch_core = "1.1.0"
+versions.mockito = "2.8.9"
+versions.kotlin = "1.2.31"
+versions.dexmaker = "2.2.0"
+versions.rxjava = "2.1.13"
+versions.rxandroid = "2.0.1"
+versions.retrofit = "2.4.0"
+versions.moshi = "1.5.0"
+versions.timber = "4.7.0"
+versions.chuck = "1.1.0"
+versions.glide = "3.7.0"
+versions.okhttp = "3.7.0"
+versions.constraint_layout = "1.0.2"
+versions.rxbinding = "2.0.0"
+versions.anko = "0.10.5"
+
+def support_library = [:]
+support_library.appcompat = "com.android.support:appcompat-v7:$versions.support_lib"
+support_library.support = "com.android.support:support-v4:$versions.support_lib"
+support_library.recyclerview = "com.android.support:recyclerview-v7:$versions.support_lib"
+support_library.design = "com.android.support:design:$versions.support_lib"
+support_library.cardview = "com.android.support:cardview-v7:$versions.support_lib"
+deps.support_library = support_library
+
+def espresso = [:]
+espresso.core = "com.android.support.test.espresso:espresso-core:$versions.espresso"
+espresso.contrib = "com.android.support.test.espresso:espresso-contrib:$versions.espresso"
+espresso.intents = "com.android.support.test.espresso:espresso-intents:$versions.espresso"
+deps.espresso = espresso
+
+def mockito = [:]
+mockito.core = "org.mockito:mockito-core:$versions.mockito"
+mockito.all = "org.mockito:mockito-all:$versions.mockito"
+mockito.android = "org.mockito:mockito-android:$versions.mockito"
+deps.mockito = mockito
+
+def dagger = [:]
+dagger.runtime = "com.google.dagger:dagger:$versions.dagger"
+dagger.android = "com.google.dagger:dagger-android:$versions.dagger"
+dagger.android_support = "com.google.dagger:dagger-android-support:$versions.dagger"
+dagger.compiler = "com.google.dagger:dagger-compiler:$versions.dagger"
+dagger.android_support_compiler = "com.google.dagger:dagger-android-processor:$versions.dagger"
+deps.dagger = dagger
+
+def rxjava = [:]
+rxjava.rx = "io.reactivex.rxjava2:rxjava:$versions.rxjava"
+rxjava.rxandroid = "io.reactivex.rxjava2:rxandroid:$versions.rxandroid"
+deps.rxjava = rxjava
+
+def kotlin = [:]
+kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
+kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+deps.kotlin = kotlin
+
+def arch_core = [:]
+arch_core.testing = "android.arch.core:core-testing:$versions.arch_core"
+arch_core.lifecycle ="android.arch.lifecycle:extensions:$versions.arch_core"
+arch_core.lifecycle_compiler = "android.arch.lifecycle:compiler:$versions.arch_core"
+arch_core.room = "android.arch.persistence.room:runtime:$versions.arch_core"
+arch_core.room_rxjava = "android.arch.persistence.room:rxjava2:$versions.arch_core"
+arch_core.room_compiler = "android.arch.persistence.room:compiler:$versions.arch_core"
+deps.arch_core = arch_core
+
+def retrofit = [:]
+retrofit.retrofit2 = "com.squareup.retrofit2:retrofit:$versions.retrofit"
+retrofit.retrofit_moshi = "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+retrofit.retrofit_rxjava = "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
+deps.retrofit = retrofit
+
+def okhttp = [:]
+okhttp.okhttp3 = "com.squareup.okhttp3:okhttp:$versions.okhttp"
+okhttp.logging = "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
+deps.okhttp = okhttp
+
+deps.junit = "junit:junit:$versions.junit"
+deps.dexmaker = "com.linkedin.dexmaker:dexmaker-mockito:$versions.dexmaker"
+deps.moshi = "com.squareup.moshi:moshi:$versions.moshi"
+deps.timber = "com.jakewharton.timber:timber:$versions.timber"
+deps.chuck = "com.readystatesoftware.chuck:library:$versions.chuck"
+deps.glide = "com.github.bumptech.glide:glide:$versions.glide"
+deps.constraint_layout = "com.android.support.constraint:constraint-layout:$versions.constraint_layout"
+deps.rx_bindings_recycler = "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$versions.rxbinding"
+deps.rx_bindings_appcompat = "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:$versions.rxbinding"
+deps.anko = "org.jetbrains.anko:anko:$versions.anko"
+ext.deps = deps
