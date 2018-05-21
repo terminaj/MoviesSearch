@@ -19,6 +19,7 @@ import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.view.GenericAdapter
 import com.sivakumarc.moviesearch.view.ScrollListener
+import com.sivakumarc.moviesearch.view.ViewConstants
 import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
 import com.sivakumarc.moviesearch.viewmodel.SearchData
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -56,7 +57,6 @@ class MovieListActivity : BaseActivity(){
         viewModel.favMoviesLiveData.observe(this,
             Observer<List<Movie>> { favResult ->
                 favResult?.let {
-                    progress_bar.visibility = View.GONE
                     text_query.visibility = View.GONE
                     no_movies.visibility = if (favResult.isEmpty()) View.VISIBLE else View.GONE
                     adapter?.setItems(favResult)
@@ -86,9 +86,13 @@ class MovieListActivity : BaseActivity(){
             disposable.add(searchData.subscribe(paginator))
             subscribe()
         }
-        progress_bar.visibility = View.VISIBLE
 
         layoutManager = recycler_view.layoutManager as GridLayoutManager
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) 2 else 1
+            }
+        }
         scrollListener = ScrollListener(layoutManager) {
             paginator.onNext(pageNumber++)
         }
@@ -187,7 +191,6 @@ class MovieListActivity : BaseActivity(){
     }
 
     private fun setData(searchResult: SearchData) {
-        progress_bar.visibility = View.GONE
         text_query.visibility = View.VISIBLE
         text_query.text = String.format(getString(R.string.showing_results_for), searchResult.query)
         no_movies.visibility = if (searchResult.movies.isEmpty()) View.VISIBLE else View.GONE
