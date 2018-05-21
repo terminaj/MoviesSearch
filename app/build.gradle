@@ -92,17 +92,17 @@ dependencies {
     androidTestImplementation deps.espresso.intents
 
     //mockito
-    testImplementation deps.mockito.core
-    androidTestImplementation deps.mockito.android
+//    testImplementation deps.mockito.core
+//    androidTestImplementation deps.mockito.android
 
     //lifecycle components
-    testImplementation (deps.arch_core.testing)
-    androidTestImplementation(deps.arch_core.testing)
+//    testImplementation (deps.arch_core.testing)
+//    androidTestImplementation(deps.arch_core.testing)
 
     //kotlin dsl for testing
     androidTestImplementation 'com.agoda.kakao:kakao:1.2.1'
 
     //run test on multiple devices, screenshot and report
-    //androidTestImplementation "com.squareup.spoon:spoon-client:2.0.0-SNAPSHOT"
+//    androidTestImplementation "com.squareup.spoon:spoon-client:2.0.0-SNAPSHOT"
 
 }
