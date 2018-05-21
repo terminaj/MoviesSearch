@@ -50,7 +50,7 @@ class MovieListActivity : BaseActivity(){
 
     private var pageNumber = 1
     private var twoPane: Boolean = false
-    private var searchQuery = "a" //initial search
+    var searchQuery = "a" //initial search
 
     val observeFav = { viewModel: MoviesListViewModel ->
         viewModel.favMoviesLiveData.observe(this,
