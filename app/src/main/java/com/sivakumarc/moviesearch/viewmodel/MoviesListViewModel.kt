@@ -7,7 +7,6 @@ import com.sivakumarc.moviesearch.model.Movie
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.PublishSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 class MoviesListViewModel @Inject
@@ -19,18 +18,9 @@ constructor(
     val favMoviesLiveData = MutableLiveData<List<Movie>>()
     private val disposable = CompositeDisposable()
 
-    init {
-        subscribe()
-    }
-
     fun loadFavoriteMovies() {
         val d2 = movieRepository.getFavMovies().subscribe(Consumer<List<Movie>> { favMoviesLiveData.postValue(it) })
         disposable.add(d2)
-    }
-
-    private fun subscribe() {
-        val d3 = movieSubject.subscribe({ _ -> loadFavoriteMovies() },{ Timber.e(it) })
-        disposable.add(d3)
     }
 
     fun searchMovies(query: String, page: Int){

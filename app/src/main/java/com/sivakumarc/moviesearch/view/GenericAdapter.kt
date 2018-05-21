@@ -12,7 +12,6 @@ import com.sivakumarc.moviesearch.view.ViewConstants.MOVIES
 class GenericAdapter(private val onClick : (Any?) -> Unit) : RecyclerView.Adapter<GenericViewHolder>() {
 
     private var items: ArrayList<ViewType> = ArrayList()
-//    private var viewTypeAdapters = SparseArrayCompat<ViewTypeAdapter>()
     private val loadingItem = object : ViewType {
         override fun getViewType() = ViewConstants.LOADING
     }
@@ -49,7 +48,7 @@ class GenericAdapter(private val onClick : (Any?) -> Unit) : RecyclerView.Adapte
         //modular code and very useful for AB testing
         //mocked layout id
 
-        return this.items.get(position).getViewType()
+        return this.items[position].getViewType()
     }
 
     fun addItems(newItems: List<ViewType>) {

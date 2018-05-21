@@ -118,6 +118,7 @@ class MovieListActivity : BaseActivity(){
 
         searchViewMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                toolbar.title = title
                 menu.findItem(R.id.action_favorites).isVisible = false
                 return true
             }
@@ -137,6 +138,7 @@ class MovieListActivity : BaseActivity(){
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when {
             item.itemId == R.id.action_favorites -> {
+                toolbar.title = getString(R.string.favorites)
                 viewModel.loadFavoriteMovies()
             }
         }
@@ -191,6 +193,9 @@ class MovieListActivity : BaseActivity(){
     }
 
     private fun setData(searchResult: SearchData) {
+        if(toolbar.title == getString(R.string.favorites))
+            return
+
         text_query.visibility = View.VISIBLE
         text_query.text = String.format(getString(R.string.showing_results_for), searchResult.query)
         no_movies.visibility = if (searchResult.movies.isEmpty()) View.VISIBLE else View.GONE
