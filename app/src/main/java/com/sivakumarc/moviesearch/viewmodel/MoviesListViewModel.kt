@@ -15,20 +15,12 @@ constructor(
     private val movieRepository: MovieRepository,
     private val movieSubject: PublishSubject<Movie>
 ) : ViewModel() {
-    val popMoviesLiveData = MutableLiveData<List<Movie>>()
     val searchMoviesLiveData = MutableLiveData<SearchData>()
     val favMoviesLiveData = MutableLiveData<List<Movie>>()
     private val disposable = CompositeDisposable()
 
     init {
         subscribe()
-    }
-
-    fun loadMovies(page: Int) {
-        val d1 = movieRepository.getPopMovies(page).subscribe(Consumer<List<Movie>> {
-            popMoviesLiveData.postValue(it)
-        })
-        disposable.add(d1)
     }
 
     fun loadFavoriteMovies() {

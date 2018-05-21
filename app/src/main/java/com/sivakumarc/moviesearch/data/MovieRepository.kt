@@ -15,10 +15,6 @@ constructor(factory: RepositoryFactory) {
     private val movieAPI: MovieAPI = factory.createMovieAPI()
     private val movieDB: MovieDB = factory.createMovieDB()
 
-    fun getPopMovies(page: Int): Single<List<Movie>> {
-        return getMovies(movieAPI.getPopularMovies(page))
-    }
-
     fun searchMovies(query: String, page: Int): Single<List<Movie>> {
         return getMovies(movieAPI.searchMovies(query, page))
     }
