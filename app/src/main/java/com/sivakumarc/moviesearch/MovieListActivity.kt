@@ -42,6 +42,7 @@ class MovieListActivity : BaseActivity(){
     private lateinit var scrollListener: ScrollListener
     private var adapter: GenericAdapter?= null
     private lateinit var searchData: LiveItemData
+
     private lateinit var searchView: SearchView
     private lateinit var searchViewMenuItem: MenuItem
 
@@ -50,6 +51,19 @@ class MovieListActivity : BaseActivity(){
     private var pageNumber = 1
     private var twoPane: Boolean = false
     private var searchQuery = "a" //initial search
+
+    val observeFav = { viewModel: MoviesListViewModel ->
+        viewModel.favMoviesLiveData.observe(this,
+            Observer<List<Movie>> { favResult ->
+                favResult?.let {
+                    progress_bar.visibility = View.GONE
+                    text_query.visibility = View.GONE
+                    no_movies.visibility = if (favResult.isEmpty()) View.VISIBLE else View.GONE
+                    adapter?.setItems(favResult)
+                }
+            }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +80,7 @@ class MovieListActivity : BaseActivity(){
 
         setSearchData()
         searchData.observe(viewModel)
-
+        observeFav.invoke(viewModel)
         recycler_view.post {
             setupRecyclerView()
             disposable.add(searchData.subscribe(paginator))
@@ -98,9 +112,31 @@ class MovieListActivity : BaseActivity(){
 
         searchViewMenuItem = menu.findItem(R.id.action_search)
 
+        searchViewMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                menu.findItem(R.id.action_favorites).isVisible = false
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                invalidateOptionsMenu()
+                menu.findItem(R.id.action_favorites).isVisible = true
+                return true
+            }
+        })
+
         setupSearchView()
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when {
+            item.itemId == R.id.action_favorites -> {
+                viewModel.loadFavoriteMovies()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setupSearchView() {
@@ -150,21 +186,22 @@ class MovieListActivity : BaseActivity(){
         searchData = LiveItemData(observeSearch, subscribeSearch)
     }
 
-    private fun setData(searchData: SearchData) {
+    private fun setData(searchResult: SearchData) {
         progress_bar.visibility = View.GONE
-        text_query.text = String.format(getString(R.string.showing_results_for), searchData.query)
-        no_movies.visibility = if (searchData.movies.isEmpty()) View.VISIBLE else View.GONE
-        if (searchQuery == searchData.query) {
-            adapter?.addItems(searchData.movies)
+        text_query.visibility = View.VISIBLE
+        text_query.text = String.format(getString(R.string.showing_results_for), searchResult.query)
+        no_movies.visibility = if (searchResult.movies.isEmpty()) View.VISIBLE else View.GONE
+        if (searchQuery == searchResult.query) {
+            adapter?.addItems(searchResult.movies)
         } else {
             setupRecyclerView()
-            adapter?.setItems(searchData.movies)
+            adapter?.setItems(searchResult.movies)
         }
 
-        this.searchQuery = searchData.query
+        this.searchQuery = searchResult.query
     }
 
-    class LiveItemData(val observer: (MoviesListViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
+    class LiveItemData(private val observer: (MoviesListViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
         fun observe(viewModel: MoviesListViewModel) {
             observer.invoke(viewModel)
         }

@@ -6,12 +6,15 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import com.jakewharton.rxbinding2.view.RxView
 import com.sivakumarc.moviesearch.databinding.ActivityMovieDetailBinding
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_movie_detail.*
+import org.jetbrains.anko.toast
 import javax.inject.Inject
 
 class MovieDetailActivity : BaseActivity() {
@@ -42,43 +45,40 @@ class MovieDetailActivity : BaseActivity() {
                 .commit()
         }
         binding.model = movie
-//        collapsing_toolbar.title = movie.title
-//        fab.isSelected = movie.isFavorite()
-//        Glide.with(this).load(String.format(getString(R.string.movie_img_url), "w780", movie.backdrop_path)).crossFade().into(image_backdrop)
         subscribe()
     }
 
     private fun subscribe() {
-//        val d1 = RxView.clicks(fab).subscribe { _ ->
-//            val isSelected = !fab.isSelected
-//            fab.isSelected = isSelected
-//            if (isSelected) {
-//                viewModel.addFavorite(movie)
-//            } else {
-//                viewModel.removeFavorite(movie)
-//            }
-//        }
-//
-//        val d2 = movieSubject.subscribe { movie1 ->
-//            val added = getString(R.string.movie_added)
-//            val removed = getString(R.string.movie_removed)
-//            val string = if (movie1.isFavorite()) added else removed
-//            toast(string)
-//        }
-//
-//        disposable.add(d1)
-//        disposable.add(d2)
+        val d1 = RxView.clicks(fab).subscribe { _ ->
+            val isSelected = !fab.isSelected
+            fab.isSelected = isSelected
+            if (isSelected) {
+                viewModel.addFavorite(movie)
+            } else {
+                viewModel.removeFavorite(movie)
+            }
+        }
+
+        val d2 = movieSubject.subscribe { movie ->
+            val added = getString(R.string.movie_added)
+            val removed = getString(R.string.movie_removed)
+            val string = if (movie.isFavorite()) added else removed
+            toast(string)
+        }
+
+        disposable.add(d1)
+        disposable.add(d2)
     }
 
-//    fun onFavoriteClicked(view: View) {
-//        val isSelected = !fab.isSelected
-//            fab.isSelected = isSelected
-//            if (isSelected) {
-//                viewModel.addFavorite(movie)
-//            } else {
-//                viewModel.removeFavorite(movie)
-//            }
-//    }
+    fun onFavoriteClicked(view: View) {
+        val isSelected = !fab.isSelected
+            fab.isSelected = isSelected
+            if (isSelected) {
+                viewModel.addFavorite(movie)
+            } else {
+                viewModel.removeFavorite(movie)
+            }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {

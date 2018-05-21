@@ -25,15 +25,15 @@ constructor(
         disposable.clear()
     }
 
-//    fun addFavorite(movie: Movie) {
-//        movie.favorite = 1
-//        movieRepository.saveMovie(movie).subscribe(MovieCompletableObserver(movie))
-//    }
-//
-//    fun removeFavorite(movie: Movie) {
-//        movie.favorite = 0
-//        movieRepository.deleteMovie(movie).subscribe(MovieCompletableObserver(movie))
-//    }
+    fun addFavorite(movie: Movie) {
+        movie.favorite = 1
+        movieRepository.saveMovie(movie).subscribe(MovieCompletableObserver(movie))
+    }
+
+    fun removeFavorite(movie: Movie) {
+        movie.favorite = 0
+        movieRepository.deleteMovie(movie).subscribe(MovieCompletableObserver(movie))
+    }
 
     private inner class MovieCompletableObserver
     internal constructor(private val movie: Movie) : CompletableObserver {

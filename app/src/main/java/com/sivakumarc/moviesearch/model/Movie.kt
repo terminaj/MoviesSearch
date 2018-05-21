@@ -47,6 +47,8 @@ data class Movie(
         dest.writeDouble(vote_average)
         dest.writeInt(favorite)
     }
+
+    fun isFavorite() = favorite == 1
 }
 
 data class MovieResponse(
