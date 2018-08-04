@@ -14,6 +14,7 @@ import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_movie_detail.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.toast
 import javax.inject.Inject
 
@@ -51,7 +52,7 @@ class MovieDetailActivity : BaseActivity() {
     }
 
     private fun subscribe() {
-        val d1 = RxView.clicks(fab).subscribe { _ ->
+        fab.onClick {
             val isSelected = !fab.isSelected
             fab.isSelected = isSelected
             if (isSelected) {
@@ -61,7 +62,7 @@ class MovieDetailActivity : BaseActivity() {
             }
         }
 
-        val d2 = anySubject.subscribe { any ->
+        val d1 = anySubject.subscribe { any ->
             val added = "Movie added to the favorites"
             val removed = "Movie removed from favorites"
             val string = if ((any as Movie).isFavorite()) added else removed
@@ -69,7 +70,6 @@ class MovieDetailActivity : BaseActivity() {
         }
 
         disposable.add(d1)
-        disposable.add(d2)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
