@@ -21,7 +21,7 @@ class MovieDetailActivity : BaseActivity() {
     @Inject
     lateinit internal var viewModelFactory: ViewModelProvider.Factory
     @Inject
-    lateinit internal var movieSubject: PublishSubject<Movie>
+    lateinit internal var movieSubject: PublishSubject<Any>
 
     private lateinit var binding: ActivityMovieDetailBinding
     private lateinit var viewModel: MovieDetailsViewModel
@@ -62,7 +62,7 @@ class MovieDetailActivity : BaseActivity() {
         val d2 = movieSubject.subscribe { movie ->
             val added = getString(R.string.movie_added)
             val removed = getString(R.string.movie_removed)
-            val string = if (movie.isFavorite()) added else removed
+            val string = if ((movie as Movie).isFavorite()) added else removed
             toast(string)
         }
 

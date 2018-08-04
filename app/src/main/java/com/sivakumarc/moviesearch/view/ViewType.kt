@@ -1,5 +1,5 @@
 package com.sivakumarc.moviesearch.view
 
-interface ViewType{
+interface ViewType {
     fun getViewType(): Int
 }

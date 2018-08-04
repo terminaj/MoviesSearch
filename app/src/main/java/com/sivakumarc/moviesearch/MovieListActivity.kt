@@ -15,14 +15,12 @@ import android.view.MenuItem
 import android.view.View
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
-import com.sivakumarc.moviesearch.R.id.*
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.view.GenericAdapter
 import com.sivakumarc.moviesearch.view.ScrollListener
 import com.sivakumarc.moviesearch.view.ViewConstants
 import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
-import com.sivakumarc.moviesearch.viewmodel.SearchData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.processors.PublishProcessor
@@ -161,7 +159,7 @@ class MovieListActivity : BaseActivity(){
                 Timber.e(it.message)
             }.subscribe{query ->
                 Timber.d("search", query)
-                viewModel.searchMovies(query.toString(), 1)
+                viewModel.getMovies(query.toString(), 1)
             }
     }
 
@@ -176,8 +174,8 @@ class MovieListActivity : BaseActivity(){
 
     private fun setSearchData() {
         val observeSearch = { viewModel: MoviesListViewModel ->
-            viewModel.searchMoviesLiveData.observe(this,
-                Observer<SearchData> { searchData ->
+            viewModel.listMoviesLiveData.observe(this,
+                Observer<List<Movie>> { searchData ->
                     searchData?.let {
                         setData(searchData)
                     }
@@ -186,28 +184,22 @@ class MovieListActivity : BaseActivity(){
 
         val subscribeSearch = { processor: PublishProcessor<Int> ->
             processor.onBackpressureDrop().subscribe { page ->
-                viewModel.searchMovies(searchQuery, page)
+                viewModel.getMovies(searchQuery, page)
             }
         }
 
         searchData = LiveItemData(observeSearch, subscribeSearch)
     }
 
-    private fun setData(searchResult: SearchData) {
+    private fun setData(searchResult: List<Movie>) {
         if(toolbar.title == getString(R.string.favorites))
             return
 
         text_query.visibility = View.VISIBLE
-        text_query.text = String.format(getString(R.string.showing_results_for), searchResult.query)
-        no_movies.visibility = if (searchResult.movies.isEmpty()) View.VISIBLE else View.GONE
-        if (searchQuery == searchResult.query) {
-            adapter?.addItems(searchResult.movies)
-        } else {
-            setupRecyclerView()
-            adapter?.setItems(searchResult.movies)
-        }
+        text_query.text = String.format(getString(R.string.showing_results_for), searchQuery)
+        no_movies.visibility = if (searchResult.isEmpty()) View.VISIBLE else View.GONE
 
-        this.searchQuery = searchResult.query
+        adapter?.addItems(searchResult)
     }
 
     class LiveItemData(private val observer: (MoviesListViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){

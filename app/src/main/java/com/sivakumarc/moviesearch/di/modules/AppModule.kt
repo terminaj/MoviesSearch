@@ -4,10 +4,7 @@ import android.app.Application
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.persistence.room.Room
 import android.content.Context
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
-
 import com.sivakumarc.moviesearch.BuildConfig
-import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.util.Constants.BASE_URL
 import com.sivakumarc.moviessearch.data.local.MoviesDB
 import com.sivakumarc.moviessearch.di.ViewModelFactory
@@ -90,8 +87,8 @@ class AppModule(internal val application: Application) {
 
   @Singleton
   @Provides
-  internal fun providesGlobalSubject(): PublishSubject<Movie> {
-    return PublishSubject.create<Movie>()
+  internal fun providesGlobalSubject(): PublishSubject<Any> {
+    return PublishSubject.create<Any>()
   }
 
   @Singleton
