@@ -21,30 +21,32 @@ class MovieDetailActivity : BaseActivity() {
     @Inject
     internal lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject
-    internal lateinit var movieSubject: PublishSubject<Any>
+    internal lateinit var anySubject: PublishSubject<Any>
 
     private lateinit var binding: ActivityMovieDetailBinding
     private lateinit var viewModel: MovieViewModel
-    private lateinit var movie: Movie
+    private lateinit var entity: Movie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail)
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+
+        //toolbar
         setSupportActionBar(detail_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
 
         if (savedInstanceState == null) {
-            movie = intent.getParcelableExtra(MovieDetailFragment.MOVIE) as Movie
-            val fragment = MovieDetailFragment.newInstance(movie)
+            entity = intent.getParcelableExtra(MovieDetailFragment.args_Movie) as Movie
+            val fragment = MovieDetailFragment.newInstance(entity)
 
             supportFragmentManager.beginTransaction()
-                .add(R.id.movie_detail_container, fragment)
-                .commit()
+                    .add(R.id.movie_detail_container, fragment)
+                    .commit()
         }
-        binding.model = movie
+        binding.model = entity
         subscribe()
     }
 
@@ -53,16 +55,16 @@ class MovieDetailActivity : BaseActivity() {
             val isSelected = !fab.isSelected
             fab.isSelected = isSelected
             if (isSelected) {
-                viewModel.addFavorite(movie)
+                viewModel.addFavorite(entity)
             } else {
-                viewModel.removeFavorite(movie)
+                viewModel.removeFavorite(entity)
             }
         }
 
-        val d2 = movieSubject.subscribe { movie ->
-            val added = getString(R.string.movie_added)
-            val removed = getString(R.string.movie_removed)
-            val string = if ((movie as Movie).isFavorite()) added else removed
+        val d2 = anySubject.subscribe { any ->
+            val added = "Movie added to the favorites"
+            val removed = "Movie removed from favorites"
+            val string = if ((any as Movie).isFavorite()) added else removed
             toast(string)
         }
 
@@ -70,22 +72,12 @@ class MovieDetailActivity : BaseActivity() {
         disposable.add(d2)
     }
 
-    fun onFavoriteClicked(view: View) {
-        val isSelected = !fab.isSelected
-            fab.isSelected = isSelected
-            if (isSelected) {
-                viewModel.addFavorite(movie)
-            } else {
-                viewModel.removeFavorite(movie)
-            }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem) =
-        when (item.itemId) {
-            android.R.id.home -> {
-                navigateUpTo(Intent(this, MovieListActivity::class.java))
-                true
+            when (item.itemId) {
+                android.R.id.home -> {
+                    navigateUpTo(Intent(this, MovieListActivity::class.java))
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
             }
-            else -> super.onOptionsItemSelected(item)
-        }
 }

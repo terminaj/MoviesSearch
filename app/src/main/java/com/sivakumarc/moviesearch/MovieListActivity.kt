@@ -221,7 +221,7 @@ class MovieListActivity : BaseActivity(){
                 .commit()
         }else {
             val intent = Intent(this, MovieDetailActivity::class.java).apply {
-                putExtra(MovieDetailFragment.MOVIE, movie)
+                putExtra(MovieDetailFragment.args_Movie, movie)
             }
             startActivity(intent)
         }
