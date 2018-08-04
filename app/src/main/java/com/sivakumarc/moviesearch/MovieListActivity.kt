@@ -33,17 +33,13 @@ import javax.inject.Inject
 
 class MovieListActivity : BaseActivity(){
 
-    private val SEARCH_QUERY_DELAY_MILLIS = 400L
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: MovieViewModel
-    private lateinit var layoutManager: GridLayoutManager
     private lateinit var scrollListener: ScrollListener
     private var adapter: GenericAdapter?= null
     private lateinit var searchData: LiveItemData
 
-    private lateinit var searchView: SearchView
     private lateinit var searchViewMenuItem: MenuItem
 
     private val paginator = PublishProcessor.create<Int>()
@@ -86,7 +82,7 @@ class MovieListActivity : BaseActivity(){
             subscribe()
         }
 
-        layoutManager = recycler_view.layoutManager as GridLayoutManager
+        val layoutManager = recycler_view.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) ViewConstants.LOADING else ViewConstants.MOVIES
@@ -96,6 +92,9 @@ class MovieListActivity : BaseActivity(){
             paginator.onNext(pageNumber++)
         }
         recycler_view.itemAnimator = DefaultItemAnimator()
+
+        searchQuery = "a"
+        viewModel.getMovies(searchQuery, 1)
     }
 
     private fun setupRecyclerView() {
@@ -129,8 +128,6 @@ class MovieListActivity : BaseActivity(){
             }
         })
 
-        setupSearchView()
-
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -142,25 +139,6 @@ class MovieListActivity : BaseActivity(){
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun setupSearchView() {
-        searchView = searchViewMenuItem.actionView as SearchView
-
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-
-        RxSearchView.queryTextChanges(searchView)
-            .filter { t: CharSequence -> t.isNotEmpty() }
-            .debounce(SEARCH_QUERY_DELAY_MILLIS, TimeUnit.MILLISECONDS)
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .observeOn(Schedulers.io())
-            .doOnError {
-                Timber.e(it.message)
-            }.subscribe{query ->
-                Timber.d("search", query)
-                viewModel.getMovies(query.toString(), 1)
-            }
     }
 
     private fun subscribe() {
