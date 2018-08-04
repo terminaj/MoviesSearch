@@ -24,7 +24,7 @@ constructor(
     }
 
     fun searchMovies(query: String, page: Int){
-        val d4 = movieRepository.searchMovies(query, page).subscribe(Consumer<List<Movie>> {
+        val d4 = movieRepository.getMovies(query, page).subscribe(Consumer<List<Movie>> {
             searchMoviesLiveData.postValue(SearchData(query, it))
         })
         disposable.add(d4)

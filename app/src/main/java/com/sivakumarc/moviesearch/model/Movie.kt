@@ -1,6 +1,7 @@
 package com.sivakumarc.moviesearch.model
 
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
 import android.os.Parcel
 import android.os.Parcelable
 import com.sivakumarc.moviesearch.view.ViewConstants
@@ -8,14 +9,14 @@ import com.sivakumarc.moviesearch.view.ViewType
 
 @Entity(tableName = "movies", primaryKeys = arrayOf("id"))
 data class Movie(
-    var id : Int = 0,
-    var title: String = "",
-    var overview: String = "",
-    var poster_path: String = "",
-    var backdrop_path: String = "",
-    var release_date: String = "",
-    var vote_average: Double = 0.0,
-    var favorite: Int = 0
+        var id : Int = 0,
+        var title: String = "",
+        var overview: String = "",
+        var poster_path: String = "",
+        var backdrop_path: String = "",
+        var release_date: String = "",
+        var vote_average: Double = 0.0,
+        var favorite: Int = 0
 ): ViewType, Parcelable {
     override fun getViewType(): Int {
         return ViewConstants.MOVIES

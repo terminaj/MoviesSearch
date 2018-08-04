@@ -7,17 +7,25 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 class MovieAPI(retrofit: Retrofit) {
-  private val movieService: MovieService
+  private val service: MovieService
 
   init {
-    movieService = retrofit.create(MovieService::class.java)
+    service = retrofit.create(MovieService::class.java)
   }
 
-  fun searchMovies(query: String, page: Int): Single<MovieResponse>{
-    return movieService.searchMovies(query, page)
+  fun getMovies(query: String): Single<MovieResponse> {
+    return service.getMovies(query)
+  }
+
+  fun getMovies(query: String, page: Int): Single<MovieResponse> {
+    return service.getMovies(query, page)
   }
 
   internal interface MovieService {
-    @GET("search/movie") fun searchMovies(@Query("query") query: String, @Query("page") page: Int?): Single<MovieResponse>
+    @GET("search/movie")
+    fun getMovies(@Query("query") query: String): Single<MovieResponse>
+
+    @GET("search/movie")
+    fun getMovies(@Query("query") query: String, @Query("page") page: Int?): Single<MovieResponse>
   }
 }

@@ -15,6 +15,7 @@ import android.view.MenuItem
 import android.view.View
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
+import com.sivakumarc.moviesearch.R.id.*
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.view.GenericAdapter
@@ -90,7 +91,7 @@ class MovieListActivity : BaseActivity(){
         layoutManager = recycler_view.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) 2 else 1
+                return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) ViewConstants.LOADING else ViewConstants.MOVIES
             }
         }
         scrollListener = ScrollListener(layoutManager) {
