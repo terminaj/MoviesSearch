@@ -2,10 +2,8 @@ package com.sivakumarc.moviessearch.di
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import android.graphics.Movie
 import android.support.v4.util.ArrayMap
-import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
-import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import com.sivakumarc.moviessearch.di.component.ViewModelSubComponent
 import java.util.concurrent.Callable
 import javax.inject.Inject
@@ -18,8 +16,7 @@ constructor(viewModelSubComponent: ViewModelSubComponent) : ViewModelProvider.Fa
   private val creators: ArrayMap<Class<*>, Callable<out ViewModel>> = ArrayMap()
 
   init {
-    creators[MoviesListViewModel::class.java] = Callable<ViewModel> { viewModelSubComponent.moviesViewModel() }
-    creators[MovieDetailsViewModel::class.java] = Callable<ViewModel> { viewModelSubComponent.movieDetailsViewModel() }
+    creators[MovieViewModel::class.java] = Callable<ViewModel> { viewModelSubComponent.movieViewModel() }
   }
 
   override fun <T : ViewModel> create(modelClass: Class<T>): T {

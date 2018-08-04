@@ -1,16 +1,13 @@
 package com.sivakumarc.moviessearch.di.component
 
-import android.graphics.Movie
-import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
-import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
+import android.arch.lifecycle.ViewModel
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import dagger.Subcomponent
 
 @Subcomponent
 interface ViewModelSubComponent {
 
-  fun moviesViewModel(): MoviesListViewModel
-
-  fun movieDetailsViewModel(): MovieDetailsViewModel
+  fun movieViewModel(): MovieViewModel
 
   @Subcomponent.Builder
   interface Builder {

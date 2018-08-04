@@ -11,7 +11,7 @@ import com.jakewharton.rxbinding2.view.RxView
 import com.sivakumarc.moviesearch.databinding.ActivityMovieDetailBinding
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
-import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_movie_detail.*
 import org.jetbrains.anko.toast
@@ -19,12 +19,12 @@ import javax.inject.Inject
 
 class MovieDetailActivity : BaseActivity() {
     @Inject
-    lateinit internal var viewModelFactory: ViewModelProvider.Factory
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject
-    lateinit internal var movieSubject: PublishSubject<Any>
+    internal lateinit var movieSubject: PublishSubject<Any>
 
     private lateinit var binding: ActivityMovieDetailBinding
-    private lateinit var viewModel: MovieDetailsViewModel
+    private lateinit var viewModel: MovieViewModel
     private lateinit var movie: Movie
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ class MovieDetailActivity : BaseActivity() {
         setSupportActionBar(detail_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailsViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
 
         if (savedInstanceState == null) {
             movie = intent.getParcelableExtra(MovieDetailFragment.MOVIE) as Movie

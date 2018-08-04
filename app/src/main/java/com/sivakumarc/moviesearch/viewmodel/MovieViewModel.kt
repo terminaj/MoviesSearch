@@ -12,7 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MoviesListViewModel @Inject
+class MovieViewModel @Inject
 constructor(
         private val repository: MovieRepository,
         private val publishSubject: PublishSubject<Any>

@@ -20,7 +20,7 @@ import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.view.GenericAdapter
 import com.sivakumarc.moviesearch.view.ScrollListener
 import com.sivakumarc.moviesearch.view.ViewConstants
-import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.processors.PublishProcessor
@@ -37,7 +37,7 @@ class MovieListActivity : BaseActivity(){
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: MoviesListViewModel
+    private lateinit var viewModel: MovieViewModel
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var scrollListener: ScrollListener
     private var adapter: GenericAdapter?= null
@@ -52,7 +52,7 @@ class MovieListActivity : BaseActivity(){
     private var twoPane: Boolean = false
     var searchQuery = "a" //initial search
 
-    val observeFav = { viewModel: MoviesListViewModel ->
+    val observeFav = { viewModel: MovieViewModel ->
         viewModel.favMoviesLiveData.observe(this,
             Observer<List<Movie>> { favResult ->
                 favResult?.let {
@@ -75,7 +75,7 @@ class MovieListActivity : BaseActivity(){
             twoPane = true
         }
         viewModel =
-                ViewModelProviders.of(this, viewModelFactory).get(MoviesListViewModel::class.java)
+                ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
 
         setSearchData()
         searchData.observe(viewModel)
@@ -173,7 +173,7 @@ class MovieListActivity : BaseActivity(){
     }
 
     private fun setSearchData() {
-        val observeSearch = { viewModel: MoviesListViewModel ->
+        val observeSearch = { viewModel: MovieViewModel ->
             viewModel.listMoviesLiveData.observe(this,
                 Observer<List<Movie>> { searchData ->
                     searchData?.let {
@@ -202,8 +202,8 @@ class MovieListActivity : BaseActivity(){
         adapter?.addItems(searchResult)
     }
 
-    class LiveItemData(private val observer: (MoviesListViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
-        fun observe(viewModel: MoviesListViewModel) {
+    class LiveItemData(private val observer: (MovieViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
+        fun observe(viewModel: MovieViewModel) {
             observer.invoke(viewModel)
         }
 
