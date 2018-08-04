@@ -2,6 +2,7 @@ package com.sivakumarc.moviessearch.di
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import android.graphics.Movie
 import android.support.v4.util.ArrayMap
 import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
 import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
@@ -11,15 +12,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Suppress("UNCHECKED_CAST")
-@Singleton class ViewModelFactory @Inject
+@Singleton
+class ViewModelFactory @Inject
 constructor(viewModelSubComponent: ViewModelSubComponent) : ViewModelProvider.Factory {
   private val creators: ArrayMap<Class<*>, Callable<out ViewModel>> = ArrayMap()
 
   init {
-    creators.put(MoviesListViewModel::class.java, Callable<ViewModel> { viewModelSubComponent.moviesViewModel() })
-    creators.put(
-      MovieDetailsViewModel::class.java,
-        Callable<ViewModel> { viewModelSubComponent.movieDetailsViewModel() })
+    creators[MoviesListViewModel::class.java] = Callable<ViewModel> { viewModelSubComponent.moviesViewModel() }
+    creators[MovieDetailsViewModel::class.java] = Callable<ViewModel> { viewModelSubComponent.movieDetailsViewModel() }
   }
 
   override fun <T : ViewModel> create(modelClass: Class<T>): T {
