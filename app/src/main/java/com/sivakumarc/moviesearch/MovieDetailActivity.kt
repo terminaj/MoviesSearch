@@ -7,7 +7,6 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import com.jakewharton.rxbinding2.view.RxView
 import com.sivakumarc.moviesearch.databinding.ActivityMovieDetailBinding
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity

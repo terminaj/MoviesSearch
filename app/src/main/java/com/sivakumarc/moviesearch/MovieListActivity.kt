@@ -1,5 +1,6 @@
 package com.sivakumarc.moviesearch
 
+import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -9,12 +10,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
-import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.view.GenericAdapter
@@ -38,27 +38,12 @@ class MovieListActivity : BaseActivity(){
     private lateinit var viewModel: MovieViewModel
     private lateinit var scrollListener: ScrollListener
     private var adapter: GenericAdapter?= null
-    private lateinit var searchData: LiveItemData
-
-    private lateinit var searchViewMenuItem: MenuItem
 
     private val paginator = PublishProcessor.create<Int>()
-
     private var pageNumber = 1
+
     private var twoPane: Boolean = false
     var searchQuery = "a" //initial search
-
-    val observeFav = { viewModel: MovieViewModel ->
-        viewModel.favMoviesLiveData.observe(this,
-            Observer<List<Movie>> { favResult ->
-                favResult?.let {
-                    text_query.visibility = View.GONE
-                    no_movies.visibility = if (favResult.isEmpty()) View.VISIBLE else View.GONE
-                    adapter?.setItems(favResult)
-                }
-            }
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,15 +55,26 @@ class MovieListActivity : BaseActivity(){
         if (movie_detail_container != null) {
             twoPane = true
         }
-        viewModel =
-                ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
 
-        setSearchData()
-        searchData.observe(viewModel)
-        observeFav.invoke(viewModel)
+        viewModel.listMoviesLiveData.observe(this,
+                Observer<List<Movie>> { data ->
+                    data?.let {
+                        setData(it)
+                    }
+                })
+
+        viewModel.favMoviesLiveData.observe(this,
+                Observer<List<Movie>> { result ->
+                    result?.let {
+                        setData(it)
+                    }
+                }
+        )
+
         recycler_view.post {
             setupRecyclerView()
-            disposable.add(searchData.subscribe(paginator))
+            disposable.add(getMoreData(paginator))
             subscribe()
         }
 
@@ -88,21 +84,21 @@ class MovieListActivity : BaseActivity(){
                 return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) ViewConstants.LOADING else ViewConstants.MOVIES
             }
         }
+
         scrollListener = ScrollListener(layoutManager) {
             paginator.onNext(pageNumber++)
         }
-        recycler_view.itemAnimator = DefaultItemAnimator()
 
         searchQuery = "a"
-        viewModel.getMovies(searchQuery, 1)
     }
 
     private fun setupRecyclerView() {
+        recycler_view.itemAnimator = DefaultItemAnimator()
         recycler_view.adapter = null
         adapter = null
-
         adapter = GenericAdapter {
-            if(it != null) {
+            //inline fn for click event inside view holder
+            if (it != null) {
                 addNextView(it as Movie)
             }
         }
@@ -112,66 +108,50 @@ class MovieListActivity : BaseActivity(){
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.movies_menu, menu)
 
-        searchViewMenuItem = menu.findItem(R.id.action_search)
-
-        searchViewMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                toolbar.title = title
-                menu.findItem(R.id.action_favorites).isVisible = false
-                return true
-            }
-
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                invalidateOptionsMenu()
-                menu.findItem(R.id.action_favorites).isVisible = true
-                return true
-            }
-        })
-
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when {
-            item.itemId == R.id.action_favorites -> {
+        when (item.itemId) {
+            R.id.action_favorites -> {
                 toolbar.title = getString(R.string.favorites)
                 viewModel.loadFavoriteMovies()
+            }
+            R.id.action_search -> {
+                toolbar.title = getString(R.string.app_name)
+                subscribeSearch.invoke(paginator)
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun subscribe() {
-        val d1 = RxRecyclerView
-            .scrollEvents(recycler_view)
-            .subscribe({
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 scrollListener.loadMore()
-            })
-        disposable.add(d1)
+            }
+        })
     }
 
-    private fun setSearchData() {
-        val observeSearch = { viewModel: MovieViewModel ->
-            viewModel.listMoviesLiveData.observe(this,
-                Observer<List<Movie>> { searchData ->
-                    searchData?.let {
-                        setData(searchData)
-                    }
-                })
+    private val subscribeSearch = { processor: PublishProcessor<Int> ->
+        //backpressure drops subsequent event untill current is completed
+        processor.onBackpressureDrop().subscribe { page ->
+            viewModel.getMovies(searchQuery, page)
         }
+    }
 
-        val subscribeSearch = { processor: PublishProcessor<Int> ->
-            processor.onBackpressureDrop().subscribe { page ->
-                viewModel.getMovies(searchQuery, page)
-            }
-        }
 
-        searchData = LiveItemData(observeSearch, subscribeSearch)
+    private fun getMoreData(processor: PublishProcessor<Int>) : Disposable {
+        return  subscribeSearch.invoke(processor)
     }
 
     private fun setData(searchResult: List<Movie>) {
-        if(toolbar.title == getString(R.string.favorites))
+
+        if(toolbar.title == getString(R.string.favorites)){
+            text_query.visibility = View.VISIBLE
+            adapter?.setItems(searchResult)
             return
+        }
 
         text_query.visibility = View.VISIBLE
         text_query.text = String.format(getString(R.string.showing_results_for), searchQuery)
@@ -180,23 +160,13 @@ class MovieListActivity : BaseActivity(){
         adapter?.addItems(searchResult)
     }
 
-    class LiveItemData(private val observer: (MovieViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
-        fun observe(viewModel: MovieViewModel) {
-            observer.invoke(viewModel)
-        }
-
-        fun subscribe(processor: PublishProcessor<Int>) = subscriber.invoke(processor)
-
-    }
-
     private fun addNextView(movie: Movie) {
         val fragment = MovieDetailFragment.newInstance(movie)
         if(twoPane){
             supportFragmentManager
-                .beginTransaction()
-                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.movie_detail_container, fragment)
-                .commit()
+                    .beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment)
+                    .commit()
         }else {
             val intent = Intent(this, MovieDetailActivity::class.java).apply {
                 putExtra(MovieDetailFragment.args_Movie, movie)
