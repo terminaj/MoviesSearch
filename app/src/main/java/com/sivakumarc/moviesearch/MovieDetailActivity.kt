@@ -7,85 +7,76 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import com.jakewharton.rxbinding2.view.RxView
 import com.sivakumarc.moviesearch.databinding.ActivityMovieDetailBinding
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.view.BaseActivity
-import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_movie_detail.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.toast
 import javax.inject.Inject
 
 class MovieDetailActivity : BaseActivity() {
     @Inject
-    lateinit internal var viewModelFactory: ViewModelProvider.Factory
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject
-    lateinit internal var movieSubject: PublishSubject<Movie>
+    internal lateinit var anySubject: PublishSubject<Any>
 
     private lateinit var binding: ActivityMovieDetailBinding
-    private lateinit var viewModel: MovieDetailsViewModel
-    private lateinit var movie: Movie
+    private lateinit var viewModel: MovieViewModel
+    private lateinit var entity: Movie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail)
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+
+        //toolbar
         setSupportActionBar(detail_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailsViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
 
         if (savedInstanceState == null) {
-            movie = intent.getParcelableExtra(MovieDetailFragment.MOVIE) as Movie
-            val fragment = MovieDetailFragment.newInstance(movie)
+            entity = intent.getParcelableExtra(MovieDetailFragment.args_Movie) as Movie
+            val fragment = MovieDetailFragment.newInstance(entity)
 
             supportFragmentManager.beginTransaction()
-                .add(R.id.movie_detail_container, fragment)
-                .commit()
+                    .add(R.id.movie_detail_container, fragment)
+                    .commit()
         }
-        binding.model = movie
+        binding.model = entity
         subscribe()
     }
 
     private fun subscribe() {
-        val d1 = RxView.clicks(fab).subscribe { _ ->
+        fab.onClick {
             val isSelected = !fab.isSelected
             fab.isSelected = isSelected
             if (isSelected) {
-                viewModel.addFavorite(movie)
+                viewModel.addFavorite(entity)
             } else {
-                viewModel.removeFavorite(movie)
+                viewModel.removeFavorite(entity)
             }
         }
 
-        val d2 = movieSubject.subscribe { movie ->
-            val added = getString(R.string.movie_added)
-            val removed = getString(R.string.movie_removed)
-            val string = if (movie.isFavorite()) added else removed
+        val d1 = anySubject.subscribe { any ->
+            val added = "Movie added to the favorites"
+            val removed = "Movie removed from favorites"
+            val string = if ((any as Movie).isFavorite()) added else removed
             toast(string)
         }
 
         disposable.add(d1)
-        disposable.add(d2)
-    }
-
-    fun onFavoriteClicked(view: View) {
-        val isSelected = !fab.isSelected
-            fab.isSelected = isSelected
-            if (isSelected) {
-                viewModel.addFavorite(movie)
-            } else {
-                viewModel.removeFavorite(movie)
-            }
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
-        when (item.itemId) {
-            android.R.id.home -> {
-                navigateUpTo(Intent(this, MovieListActivity::class.java))
-                true
+            when (item.itemId) {
+                android.R.id.home -> {
+                    navigateUpTo(Intent(this, MovieListActivity::class.java))
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
             }
-            else -> super.onOptionsItemSelected(item)
-        }
 }

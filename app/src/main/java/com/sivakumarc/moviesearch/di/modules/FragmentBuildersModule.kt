@@ -1,13 +1,15 @@
 package com.sivakumarc.moviessearch.di.modules
 
+import android.graphics.Movie
 import com.sivakumarc.moviesearch.MovieDetailFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
-@Module abstract class FragmentBuildersModule {
+@Module
+interface FragmentBuildersModule {
   @ContributesAndroidInjector
-  internal abstract fun detailFragment(): MovieDetailFragment
+  fun detailFragment(): MovieDetailFragment
 
 //  @ContributesAndroidInjector
-//  internal abstract fun moviesFragment(): MoviesListFragment
+//  internal abstract fun MoviesFragment(): MoviesListFragment
 }

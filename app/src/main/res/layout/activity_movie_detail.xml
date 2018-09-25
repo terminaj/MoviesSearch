@@ -2,9 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <variable name="model" type="com.sivakumarc.moviesearch.model.Movie"/>
+
+        <variable
+            name="model"
+            type="com.sivakumarc.moviesearch.model.Movie" />
     </data>
+
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -52,7 +57,7 @@
             android:id="@+id/movie_detail_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -62,7 +67,6 @@
             android:layout_margin="@dimen/fab_margin"
             app:backgroundTint="@color/white"
             app:selected="@{model.favorite}"
-            android:onClick="onFavoriteClicked"
             app:layout_anchor="@+id/movie_detail_container"
             app:layout_anchorGravity="top|end"
             app:srcCompat="@drawable/selector_favorite" />

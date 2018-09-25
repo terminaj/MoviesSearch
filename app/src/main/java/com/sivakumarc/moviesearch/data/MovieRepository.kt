@@ -3,7 +3,7 @@ package com.sivakumarc.moviesearch.data
 import com.sivakumarc.moviesearch.data.remote.MovieAPI
 import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.model.MovieResponse
-import com.sivakumarc.moviessearch.data.local.MovieDB
+import com.sivakumarc.moviessearch.data.local.MovieTable
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -12,38 +12,39 @@ import javax.inject.Inject
 
 class MovieRepository @Inject
 constructor(factory: RepositoryFactory) {
-    private val movieAPI: MovieAPI = factory.createMovieAPI()
-    private val movieDB: MovieDB = factory.createMovieDB()
+    private val entityAPI: MovieAPI = factory.createMovieAPI()
+    private val entityDB: MovieTable = factory.createMovieDB()
 
-    fun searchMovies(query: String, page: Int): Single<List<Movie>> {
-        return getMovies(movieAPI.searchMovies(query, page))
+    fun getMovies(query: String, page: Int): Single<List<Movie>> {
+        return getMovies(entityAPI.getMovies(query, page))
     }
 
     fun getFavMovies(): Single<List<Movie>> {
-        return movieDB.getFavoriteMovies()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .unsubscribeOn(Schedulers.io())
+        return entityDB.getFavoriteMovies()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
     }
 
-    fun saveMovie(movie: Movie): Completable {
-        return movieDB.saveMovie(movie)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .unsubscribeOn(Schedulers.io())
+    fun saveMovie(entity: Movie): Completable {
+        return entityDB.insertMovie(entity)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
     }
 
-    fun deleteMovie(movie: Movie): Completable {
-        return movieDB.deleteMovie(movie)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .unsubscribeOn(Schedulers.io())
+    fun deleteMovie(entity: Movie): Completable {
+        return entityDB.deleteMovie(entity)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
     }
 
-    private fun getMovies(movieResponseSingle: Single<MovieResponse>): Single<List<Movie>> {
-        return movieResponseSingle.flatMap { movieResponse -> Single.just<List<Movie>>(movieResponse.results) }
-            .subscribeOn(
-                Schedulers.io()
-            ).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
+    private fun getMovies(entityResponseSingle: Single<MovieResponse>): Single<List<Movie>> {
+        return entityResponseSingle.flatMap { response ->
+            Single.just<List<Movie>>(response.results)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
     }
 }

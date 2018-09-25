@@ -15,9 +15,11 @@ interface AppComponent {
 
   fun inject(application: MoviesSearchApplication)
 
-  @Component.Builder interface Builder {
+  @Component.Builder
+  interface Builder {
     @BindsInstance
     fun application(application: Application): Builder
+
     fun appModule(appModule: AppModule): Builder
     fun build(): AppComponent
   }

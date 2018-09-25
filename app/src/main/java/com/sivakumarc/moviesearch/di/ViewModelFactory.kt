@@ -3,23 +3,20 @@ package com.sivakumarc.moviessearch.di
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.support.v4.util.ArrayMap
-import com.sivakumarc.moviesearch.viewmodel.MovieDetailsViewModel
-import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import com.sivakumarc.moviessearch.di.component.ViewModelSubComponent
 import java.util.concurrent.Callable
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Suppress("UNCHECKED_CAST")
-@Singleton class ViewModelFactory @Inject
+@Singleton
+class ViewModelFactory @Inject
 constructor(viewModelSubComponent: ViewModelSubComponent) : ViewModelProvider.Factory {
   private val creators: ArrayMap<Class<*>, Callable<out ViewModel>> = ArrayMap()
 
   init {
-    creators.put(MoviesListViewModel::class.java, Callable<ViewModel> { viewModelSubComponent.moviesViewModel() })
-    creators.put(
-      MovieDetailsViewModel::class.java,
-        Callable<ViewModel> { viewModelSubComponent.movieDetailsViewModel() })
+    creators[MovieViewModel::class.java] = Callable<ViewModel> { viewModelSubComponent.movieViewModel() }
   }
 
   override fun <T : ViewModel> create(modelClass: Class<T>): T {

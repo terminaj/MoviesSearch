@@ -15,20 +15,20 @@ class MovieDetailFragment : BaseFragment(), Injectable {
     private lateinit var binding: LayoutMovieDetailBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.layout_movie_detail, container,false)
-        binding.model = arguments?.get(MOVIE) as Movie
+        binding = DataBindingUtil.inflate(inflater, R.layout.layout_movie_detail, container, false)
+        binding.model = arguments?.get(args_Movie) as Movie
         return binding.root
     }
 
     companion object {
-        val MOVIE = "MOVIE"
-        fun newInstance(movie: Movie): MovieDetailFragment {
+        val args_Movie = "Movie"
+        fun newInstance(entity: Movie): MovieDetailFragment {
             val args = Bundle()
             val fragment = MovieDetailFragment()
-            args.putParcelable(MOVIE, movie)
+            args.putParcelable(args_Movie, entity)
             fragment.arguments = args
             return fragment
         }
