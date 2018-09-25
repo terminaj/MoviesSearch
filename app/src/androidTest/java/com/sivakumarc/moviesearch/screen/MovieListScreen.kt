@@ -5,7 +5,7 @@ import com.agoda.kakao.*
 import com.sivakumarc.moviesearch.R
 import org.hamcrest.Matcher
 
-class MovieListScreen: Screen<MovieListScreen>() {
+class MovieListScreen : Screen<MovieListScreen>() {
 
     val searchQuery: KTextView = KTextView { withId(R.id.text_query) }
 
