@@ -41,8 +41,9 @@ constructor(factory: RepositoryFactory) {
     }
 
     private fun getMovies(entityResponseSingle: Single<MovieResponse>): Single<List<Movie>> {
-        return entityResponseSingle.flatMap { entityResponse -> Single.just<List<Movie>>(entityResponse.results) }
-                .subscribeOn(Schedulers.io())
+        return entityResponseSingle.flatMap { response ->
+            Single.just<List<Movie>>(response.results)
+        }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
     }
