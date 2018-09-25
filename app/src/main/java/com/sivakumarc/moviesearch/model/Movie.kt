@@ -1,59 +1,40 @@
 package com.sivakumarc.moviesearch.model
 
 import android.arch.persistence.room.Entity
-import android.os.Parcel
 import android.os.Parcelable
 import com.sivakumarc.moviesearch.view.ViewConstants
 import com.sivakumarc.moviesearch.view.ViewType
+import kotlinx.android.parcel.Parcelize
 
+
+data class MovieResponse(
+    var page: Int = 0,
+    var total_results: Int = 0,
+    var total_pages: Int = 0,
+    var results: List<Movie> = listOf()
+)
+
+@Parcelize
 @Entity(tableName = "movies", primaryKeys = arrayOf("id"))
 data class Movie(
-    var id : Int = 0,
-    var title: String = "",
-    var overview: String = "",
-    var poster_path: String = "",
-    var backdrop_path: String = "",
-    var release_date: String = "",
+    var vote_count: Int = 0,
+    var id: Int = 0,
+    var video: Boolean = false,
     var vote_average: Double = 0.0,
+    var title: String = "",
+    var popularity: Double = 0.0,
+    var poster_path: String = "",
+    var original_language: String = "",
+    var original_title: String = "",
+    var backdrop_path: String = "",
+    var adult: Boolean = false,
+    var overview: String = "",
+    var release_date: String = "",
     var favorite: Int = 0
-): ViewType, Parcelable {
+) : Parcelable, ViewType {
     override fun getViewType(): Int {
         return ViewConstants.MOVIES
     }
 
-    companion object {
-        @JvmField val CREATOR: Parcelable.Creator<Movie> = object : Parcelable.Creator<Movie> {
-            override fun createFromParcel(source: Parcel): Movie = Movie(source.readInt(),
-                source.readString(),
-                source.readString(),
-                source.readString(),
-                source.readString(),
-                source.readString(),
-                source.readDouble(),
-                source.readInt())
-            override fun newArray(size: Int): Array<Movie?> = arrayOfNulls(size)
-        }
-    }
-
-    override fun describeContents() = 0
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(id)
-        dest.writeString(title)
-        dest.writeString(overview)
-        dest.writeString(poster_path)
-        dest.writeString(backdrop_path)
-        dest.writeString(release_date)
-        dest.writeDouble(vote_average)
-        dest.writeInt(favorite)
-    }
-
     fun isFavorite() = favorite == 1
 }
-
-data class MovieResponse(
-    var page: Int,
-    var results: List<Movie>,
-    var total_results: Int,
-    var total_pages: Int
-)

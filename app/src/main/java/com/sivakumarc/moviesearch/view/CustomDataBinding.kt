@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 fun setImageUrl(view: ImageView, url: String) {
     Glide.with(view.context).load(url).crossFade().into(view)
 }
+
 @BindingAdapter("selected")
 fun setSelection(view: FloatingActionButton, isSelected: Int) {
     view.isSelected = isSelected == 1

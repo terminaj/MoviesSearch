@@ -20,8 +20,7 @@ import com.sivakumarc.moviesearch.view.BaseActivity
 import com.sivakumarc.moviesearch.view.GenericAdapter
 import com.sivakumarc.moviesearch.view.ScrollListener
 import com.sivakumarc.moviesearch.view.ViewConstants
-import com.sivakumarc.moviesearch.viewmodel.MoviesListViewModel
-import com.sivakumarc.moviesearch.viewmodel.SearchData
+import com.sivakumarc.moviesearch.viewmodel.MovieViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.processors.PublishProcessor
@@ -38,7 +37,7 @@ class MovieListActivity : BaseActivity(){
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: MoviesListViewModel
+    private lateinit var viewModel: MovieViewModel
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var scrollListener: ScrollListener
     private var adapter: GenericAdapter?= null
@@ -53,7 +52,7 @@ class MovieListActivity : BaseActivity(){
     private var twoPane: Boolean = false
     var searchQuery = "a" //initial search
 
-    val observeFav = { viewModel: MoviesListViewModel ->
+    val observeFav = { viewModel: MovieViewModel ->
         viewModel.favMoviesLiveData.observe(this,
             Observer<List<Movie>> { favResult ->
                 favResult?.let {
@@ -76,7 +75,7 @@ class MovieListActivity : BaseActivity(){
             twoPane = true
         }
         viewModel =
-                ViewModelProviders.of(this, viewModelFactory).get(MoviesListViewModel::class.java)
+                ViewModelProviders.of(this, viewModelFactory).get(MovieViewModel::class.java)
 
         setSearchData()
         searchData.observe(viewModel)
@@ -90,7 +89,7 @@ class MovieListActivity : BaseActivity(){
         layoutManager = recycler_view.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) 2 else 1
+                return if (adapter?.getItemViewType(position) == ViewConstants.LOADING) ViewConstants.LOADING else ViewConstants.MOVIES
             }
         }
         scrollListener = ScrollListener(layoutManager) {
@@ -160,7 +159,7 @@ class MovieListActivity : BaseActivity(){
                 Timber.e(it.message)
             }.subscribe{query ->
                 Timber.d("search", query)
-                viewModel.searchMovies(query.toString(), 1)
+                viewModel.getMovies(query.toString(), 1)
             }
     }
 
@@ -174,9 +173,9 @@ class MovieListActivity : BaseActivity(){
     }
 
     private fun setSearchData() {
-        val observeSearch = { viewModel: MoviesListViewModel ->
-            viewModel.searchMoviesLiveData.observe(this,
-                Observer<SearchData> { searchData ->
+        val observeSearch = { viewModel: MovieViewModel ->
+            viewModel.listMoviesLiveData.observe(this,
+                Observer<List<Movie>> { searchData ->
                     searchData?.let {
                         setData(searchData)
                     }
@@ -185,32 +184,26 @@ class MovieListActivity : BaseActivity(){
 
         val subscribeSearch = { processor: PublishProcessor<Int> ->
             processor.onBackpressureDrop().subscribe { page ->
-                viewModel.searchMovies(searchQuery, page)
+                viewModel.getMovies(searchQuery, page)
             }
         }
 
         searchData = LiveItemData(observeSearch, subscribeSearch)
     }
 
-    private fun setData(searchResult: SearchData) {
+    private fun setData(searchResult: List<Movie>) {
         if(toolbar.title == getString(R.string.favorites))
             return
 
         text_query.visibility = View.VISIBLE
-        text_query.text = String.format(getString(R.string.showing_results_for), searchResult.query)
-        no_movies.visibility = if (searchResult.movies.isEmpty()) View.VISIBLE else View.GONE
-        if (searchQuery == searchResult.query) {
-            adapter?.addItems(searchResult.movies)
-        } else {
-            setupRecyclerView()
-            adapter?.setItems(searchResult.movies)
-        }
+        text_query.text = String.format(getString(R.string.showing_results_for), searchQuery)
+        no_movies.visibility = if (searchResult.isEmpty()) View.VISIBLE else View.GONE
 
-        this.searchQuery = searchResult.query
+        adapter?.addItems(searchResult)
     }
 
-    class LiveItemData(private val observer: (MoviesListViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
-        fun observe(viewModel: MoviesListViewModel) {
+    class LiveItemData(private val observer: (MovieViewModel) -> Unit, private val subscriber: (PublishProcessor<Int>) -> Disposable){
+        fun observe(viewModel: MovieViewModel) {
             observer.invoke(viewModel)
         }
 
@@ -228,7 +221,7 @@ class MovieListActivity : BaseActivity(){
                 .commit()
         }else {
             val intent = Intent(this, MovieDetailActivity::class.java).apply {
-                putExtra(MovieDetailFragment.MOVIE, movie)
+                putExtra(MovieDetailFragment.args_Movie, movie)
             }
             startActivity(intent)
         }

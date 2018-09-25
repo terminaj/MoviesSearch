@@ -9,11 +9,11 @@ import com.sivakumarc.moviesearch.databinding.ViewMovieBinding
 import com.sivakumarc.moviesearch.view.ViewConstants.LOADING
 import com.sivakumarc.moviesearch.view.ViewConstants.MOVIES
 
-class GenericAdapter(private val onClick : (Any?) -> Unit) : RecyclerView.Adapter<GenericViewHolder>() {
+class GenericAdapter(private val onClick: (Any?) -> Unit) : RecyclerView.Adapter<GenericViewHolder>() {
 
     private var items: ArrayList<ViewType> = ArrayList()
     private val loadingItem = object : ViewType {
-        override fun getViewType() = ViewConstants.LOADING
+        override fun getViewType() = LOADING
     }
 
     init {
@@ -53,7 +53,7 @@ class GenericAdapter(private val onClick : (Any?) -> Unit) : RecyclerView.Adapte
 
     fun addItems(newItems: List<ViewType>) {
         val initPosition = items.size - 1
-        if(initPosition > -1) {
+        if (initPosition > -1) {
             items.removeAt(initPosition)
             notifyItemRemoved(initPosition)
         }

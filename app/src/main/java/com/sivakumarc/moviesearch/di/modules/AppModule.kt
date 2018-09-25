@@ -4,10 +4,7 @@ import android.app.Application
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.persistence.room.Room
 import android.content.Context
-
-import com.readystatesoftware.chuck.ChuckInterceptor
 import com.sivakumarc.moviesearch.BuildConfig
-import com.sivakumarc.moviesearch.model.Movie
 import com.sivakumarc.moviesearch.util.Constants.BASE_URL
 import com.sivakumarc.moviessearch.data.local.MoviesDB
 import com.sivakumarc.moviessearch.di.ViewModelFactory
@@ -49,8 +46,8 @@ class AppModule(internal val application: Application) {
       val originalHttpUrl = original.url()
 
       val url = originalHttpUrl.newBuilder()
-          .addQueryParameter("api_key", BuildConfig.MOVIE_DB_API_KEY)
-          .build()
+              .addQueryParameter("api_key", BuildConfig.API_KEY)
+              .build()
 
       val requestBuilder = original.newBuilder().url(url)
 
@@ -60,17 +57,19 @@ class AppModule(internal val application: Application) {
     val loggingInterceptor = HttpLoggingInterceptor { message -> Timber.tag("OkHttp").d(message) }
     loggingInterceptor.level = HttpLoggingInterceptor.Level.BASIC
 
+    //cache to provide offline support
+    //server might need to implement last changed time to sync data only when there's a change
+    //okHttpClient automatically implements last changed time stamp for client
     val cacheSize = 10 * 1024 * 1024
     val cache = Cache(application.cacheDir, cacheSize.toLong())
 
     return OkHttpClient.Builder()
-        .addInterceptor(networkInterceptor)
-        .addInterceptor(loggingInterceptor)
-        .addInterceptor(ChuckInterceptor(application))
-        .cache(cache)
-        .connectTimeout(40, TimeUnit.SECONDS)
-        .readTimeout(40, TimeUnit.SECONDS)
-        .build()
+            .addInterceptor(networkInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .cache(cache)
+            .connectTimeout(40, TimeUnit.SECONDS)
+            .readTimeout(40, TimeUnit.SECONDS)
+            .build()
   }
 
   @Singleton
@@ -78,29 +77,30 @@ class AppModule(internal val application: Application) {
   internal fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
 
     return Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(MoshiConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .build()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+
+            .build()
   }
 
   @Singleton
   @Provides
-  internal fun providesMovieSubject(): PublishSubject<Movie> {
-    return PublishSubject.create<Movie>()
+  internal fun providesGlobalSubject(): PublishSubject<Any> {
+    return PublishSubject.create<Any>()
   }
 
   @Singleton
   @Provides
   internal fun provideDb(): MoviesDB {
-    return Room.databaseBuilder(application, MoviesDB::class.java, "movie.db").build()
+    return Room.databaseBuilder(application, MoviesDB::class.java, "Movies.db").build()
   }
 
   @Singleton
   @Provides
   internal fun provideViewModelFactory(
-      viewModelSubComponent: ViewModelSubComponent.Builder): ViewModelProvider.Factory {
+          viewModelSubComponent: ViewModelSubComponent.Builder): ViewModelProvider.Factory {
     return ViewModelFactory(viewModelSubComponent.build())
   }
 }

@@ -1,10 +1,9 @@
 package com.sivakumarc.moviesearch.view
 
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView.LayoutManager
 
-class ScrollListener(val layoutManager: LayoutManager, val f: () -> Unit ) {
+class ScrollListener(val layoutManager: LayoutManager, val f: () -> Unit) {
 
   private var previousTotal = 0
   private var loading = true
@@ -18,8 +17,6 @@ class ScrollListener(val layoutManager: LayoutManager, val f: () -> Unit ) {
     totalItemCount = layoutManager.itemCount
     if (layoutManager is GridLayoutManager) {
       firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
-    } else if (layoutManager is LinearLayoutManager) {
-      firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
     }
 
     if (loading) {
@@ -30,7 +27,7 @@ class ScrollListener(val layoutManager: LayoutManager, val f: () -> Unit ) {
     }
 
     if (!loading &&
-        (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+            (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
       f()
       loading = true
     }
